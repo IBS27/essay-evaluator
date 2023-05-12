@@ -1,2 +1,3 @@
 # essay-evaluator
-Essay evaluator
+
+Essay evaluating program.
