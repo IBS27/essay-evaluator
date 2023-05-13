@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.2/dist/semantic.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.2/dist/semantic.min.js"></script>
+
+<head lang="en">
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}" />
+  <title>Essay Evaluator</title>
+</head>
+
+<body>
+  <h1>Essay Evaluator</h1>
+  <div id="text" class="ui form">
+    <div id="text" class="field">
+      <textarea name="essay_input" rows="30" placeholder="Enter your essay here"></textarea>
+    </div>
+  </div>
+  <!-- <br /> -->
+  <button id="submit" class="ui button">Submit</button>
+</body>
+
+</html>
