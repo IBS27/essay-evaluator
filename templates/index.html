@@ -14,11 +14,15 @@
   <h1>Essay Evaluator</h1>
   <div id="text" class="ui form">
     <div id="text" class="field">
-      <textarea name="essay_input" rows="30" placeholder="Enter your essay here"></textarea>
+      <form action="/" name="essayform" method="POST">
+        <textarea name="essay_input" rows="30" placeholder="Enter your essay here"></textarea>
+        <input id="submit" class="ui button" type="submit" value="Submit">
+      </form>
     </div>
   </div>
-  <!-- <br /> -->
-  <button id="submit" class="ui button">Submit</button>
+  <div id="score" class="ui big text">
+    {{ score }}
+  </div>
 </body>
 
 </html>
