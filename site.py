@@ -112,6 +112,8 @@ def index():
 def submit():
     text = request.form["essay_input"]
     essay_score = convertToVec(text)
+    if essay_score == None:
+        essay_score = 0
     score = f"Score: {essay_score}/10"
     return render_template("index.html", score=score)
 
