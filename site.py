@@ -1,9 +1,20 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, url_for, jsonify
+import site
 import numpy as np
+import pandas as pd
 import nltk
 import re
 from nltk.corpus import stopwords
+from nltk.tokenize import sent_tokenize, word_tokenize
+from gensim.models import Word2Vec
+from keras.layers import Embedding, LSTM, Dense, Dropout, Lambda, Flatten
+from keras.models import Sequential, load_model, model_from_config
+import keras.backend as K
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import cohen_kappa_score
 from gensim.models.keyedvectors import KeyedVectors
+from keras import backend as K
 
 
 def sent2word(x):
@@ -19,7 +30,8 @@ def sent2word(x):
 
 
 def essay2word(essay):
-    essay = essay.strip() tokenizer = nltk.data.load("tokenizers/punkt/english.pickle")
+    essay = essay.strip()
+    tokenizer = nltk.data.load("tokenizers/punkt/english.pickle")
     raw = tokenizer.tokenize(essay)
     final_words = []
     for i in raw:
