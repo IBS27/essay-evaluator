@@ -80,12 +80,12 @@ def get_model():
     return model
 
 
-def convertToVec(text):
+def convertToVec(text, essay_num):
     content = text
     if len(content) > 20:
         num_features = 300
         model = KeyedVectors.load_word2vec_format(
-            "model/word2vecmodel.bin", binary=True
+            f"model/essay{essay_num}/word2vecmodel.bin", binary=True
         )
         clean_test_essays = []
         clean_test_essays.append(sent2word(content))
@@ -95,7 +95,7 @@ def convertToVec(text):
             testDataVecs, (testDataVecs.shape[0], 1, testDataVecs.shape[1])
         )
 
-        lstm_model = load_model("model/final_lstm.h5")
+        lstm_model = load_model(f"model/essay{essay_num}/final_lstm.h5")
         preds = lstm_model.predict(testDataVecs)
         return str(round(preds[0][0]))
 
@@ -110,12 +110,31 @@ def index():
 
 @app.route("/", methods=["POST"])
 def submit():
-    text = request.form["essay_input"]
-    essay_score = convertToVec(text)
-    if essay_score == None:
-        essay_score = 0
-    score = f"Score: {essay_score}/10"
-    return render_template("index.html", score=score)
+    essay1 = request.form["essay1"]
+    score1 = convertToVec(essay1, 1)
+
+    essay2 = request.form["essay2"]
+    score2 = convertToVec(essay2, 2)
+
+    essay3 = request.form["essay3"]
+    score3 = convertToVec(essay3, 3)
+
+    essay4 = request.form["essay4"]
+    score4 = convertToVec(essay4, 4)
+
+    essay5 = request.form["essay5"]
+    score5 = convertToVec(essay5, 5)
+
+    scores = [score1, score2, score3, score4, score5]
+    final_scores = []
+    for score in scores:
+        if score is None:
+            continue
+        else:
+            final_scores.append(int(score))
+
+    total_score = f"Score: {sum(final_scores) * 2}/100"
+    return render_template("index.html", total_score=total_score)
 
 
 if __name__ == "__main__":

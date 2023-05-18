@@ -1,5 +1,7 @@
 body {
   background: linear-gradient(to top, #4ca1af, #c4e0e5);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   padding: 50px;
 }
 
@@ -26,5 +28,7 @@ h1 {
 
 #score {
   margin-left: 20px;
+  margin-top: -10px;
+  margin-bottom: 20px;
   font-weight: bold;
 }
