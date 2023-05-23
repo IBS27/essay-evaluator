@@ -1,58 +1,19 @@
+from math import isnan
 from flask import Flask, request, render_template
+from gensim.models import word2vec
 import numpy as np
+from preprocess import *
 import nltk
 import re
 from nltk.corpus import stopwords
 from keras.layers import LSTM, Dense, Dropout
 from keras.models import Sequential, load_model
+import keras.backend as K
 from gensim.models.keyedvectors import KeyedVectors
 
 
-def sent2word(x):
-    stop_words = set(stopwords.words("english"))
-    x = re.sub("[^A-Za-z]", " ", x)
-    x.lower()
-    filtered_sentence = []
-    words = x.split()
-    for w in words:
-        if w not in stop_words:
-            filtered_sentence.append(w)
-    return filtered_sentence
-
-
-def essay2word(essay):
-    essay = essay.strip()
-    tokenizer = nltk.data.load("tokenizers/punkt/english.pickle")
-    raw = tokenizer.tokenize(essay)
-    final_words = []
-    for i in raw:
-        if len(i) > 0:
-            final_words.append(sent2word(i))
-    return final_words
-
-
-def makeVec(words, model, num_features):
-    vec = np.zeros((num_features,), dtype="float32")
-    noOfWords = 0.0
-    index2word_set = set(model.index_to_key)
-    for i in words:
-        if i in index2word_set:
-            noOfWords += 1
-            vec = np.add(vec, model[i])
-    vec = np.divide(vec, noOfWords)
-    return vec
-
-
-def getVecs(essays, model, num_features):
-    c = 0
-    essay_vecs = np.zeros((len(essays), num_features), dtype="float32")
-    for i in essays:
-        essay_vecs[c] = makeVec(i, model, num_features)
-        c += 1
-    return essay_vecs
-
-
 def get_model():
+    """Define the model."""
     model = Sequential()
     model.add(
         LSTM(
@@ -66,30 +27,50 @@ def get_model():
     model.add(LSTM(64, recurrent_dropout=0.4))
     model.add(Dropout(0.5))
     model.add(Dense(1, activation="relu"))
+
     model.compile(loss="mean_squared_error", optimizer="rmsprop", metrics=["mae"])
     model.summary()
+
     return model
 
 
-def convertToVec(text, essay_num):
-    content = text
-    if len(content) > 20:
-        num_features = 300
-        model = KeyedVectors.load_word2vec_format(
-            f"model/essay{essay_num}/word2vecmodel.bin", binary=True
-        )
-        clean_test_essays = []
-        clean_test_essays.append(sent2word(content))
-        testDataVecs = getVecs(clean_test_essays, model, num_features)
-        testDataVecs = np.array(testDataVecs)
-        testDataVecs = np.reshape(
-            testDataVecs, (testDataVecs.shape[0], 1, testDataVecs.shape[1])
-        )
+def get_preds(content=""):
+    num_features = 300
+    model = word2vec.Word2VecKeyedVectors.load_word2vec_format(
+        "./model/word2vecmodel.bin", binary=True
+    )
+    clean_test_essays = []
+    clean_test_essays.append(essay_to_wordlist(content, remove_stopwords=True))
+    test_data_vecs = getAvgFeatureVecs(clean_test_essays, model, num_features)
+    test_data_vecs = np.array(test_data_vecs)
+    test_data_vecs = np.reshape(
+        test_data_vecs, (test_data_vecs.shape[0], 1, test_data_vecs.shape[1])
+    )
 
-        lstm_model = load_model(f"model/essay{essay_num}/final_lstm.h5")
-        preds = lstm_model.predict(testDataVecs)
-        return str(round(preds[0][0]))
+    lstm_model = get_model()
+    lstm_model.load_weights("./model/final_lstm.h5")
+    preds = lstm_model.predict(test_data_vecs)
 
+    if len(content) < 1000:
+        preds = 0
+
+    return preds
+
+
+def get_score(preds, max_score):
+    if isnan(preds):
+        preds = 0
+    else:
+        preds = np.around(preds)
+
+    if preds < 0 or preds >= max_score or (preds / max_score) <= 0.5:
+        preds = 0
+
+    score = np.around((preds / max_score) * 10) * 2
+    return int(score)
+
+
+maximum_scores = [12, 6, 5, 30, 60]
 
 app = Flask(__name__)
 
@@ -102,29 +83,31 @@ def index():
 @app.route("/", methods=["POST"])
 def submit():
     essay1 = request.form["essay1"]
-    score1 = convertToVec(essay1, 1)
+    preds1 = get_preds(essay1)
+    score1 = get_score(preds1, maximum_scores[0])
 
     essay2 = request.form["essay2"]
-    score2 = convertToVec(essay2, 2)
+    preds2 = get_preds(essay2)
+    score2 = get_score(preds2, maximum_scores[1])
 
     essay3 = request.form["essay3"]
-    score3 = convertToVec(essay3, 3)
+    preds3 = get_preds(essay3)
+    score3 = get_score(preds3, maximum_scores[2])
 
     essay4 = request.form["essay4"]
-    score4 = convertToVec(essay4, 4)
+    preds4 = get_preds(essay4)
+    score4 = get_score(preds4, maximum_scores[3])
 
     essay5 = request.form["essay5"]
-    score5 = convertToVec(essay5, 5)
+    preds5 = get_preds(essay5)
+    score5 = get_score(preds5, maximum_scores[4])
 
     scores = [score1, score2, score3, score4, score5]
-    final_scores = []
-    for score in scores:
-        if score is None:
-            continue
-        else:
-            final_scores.append(int(score))
+    scores = np.int_(scores)
 
-    total_score = f"Score: {sum(final_scores)}/100"
+    K.clear_session()
+
+    total_score = f"Score: {sum(scores)}/100"
     return render_template("index.html", total_score=total_score)
 
 

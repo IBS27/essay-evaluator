@@ -13,6 +13,7 @@
 <body>
   <h1>Essay Evaluator</h1>
   <div id="text" class="ui form">
+    <div id="score" class="ui big text">{{ total_score }}</div>
     <div id="text" class="field">
       <form action="/" name="essayform" method="POST">
         <p id="text" class="ui big text">
@@ -48,17 +49,6 @@
         <br />
         <br />
         <p id="text" class="ui big text">
-          Write about patience. Being patient means that you are understanding
-          and tolerant. A patient person experience difficulties without
-          complaining. Do only one of the following: write a story about a
-          time when you were patient OR write a story about a time when
-          someone you know was patient OR write a story in your own way about
-          patience.
-        </p>
-        <textarea name="essay3" rows="20" placeholder="Enter your essay here"></textarea>
-        <br />
-        <br />
-        <p id="text" class="ui big text">
           The author, Narciso Rodriguez, reflects on his childhood home in
           Newark, New Jersey, where his Cuban immigrant parents created a
           traditional and loving environment. Despite the challenges of racism
@@ -75,6 +65,17 @@
           Describe the mood in the paragraph. Support your answer with
           relevant information from the paragraph.
         </p>
+        <textarea name="essay3" rows="20" placeholder="Enter your essay here"></textarea>
+        <br />
+        <br />
+        <p id="text" class="ui big text">
+          Write about patience. Being patient means that you are understanding
+          and tolerant. A patient person experience difficulties without
+          complaining. Do only one of the following: write a story about a
+          time when you were patient OR write a story about a time when
+          someone you know was patient OR write a story in your own way about
+          patience.
+        </p>
         <textarea name="essay4" rows="20" placeholder="Enter your essay here"></textarea>
         <br />
         <br />
@@ -90,7 +91,6 @@
       </form>
     </div>
   </div>
-  <div id="score" class="ui big text">{{ total_score }}</div>
 </body>
 
 </html>
