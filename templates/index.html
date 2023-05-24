@@ -7,13 +7,18 @@
 <head lang="en">
   <meta charset="UTF-8" />
   <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}" />
-  <title>Essay Evaluator</title>
+  <script type="text/javascript" src="../static/js/script.js"></script>
+  <title>GradeWizard</title>
 </head>
 
 <body>
-  <h1>Essay Evaluator</h1>
+  <h1>GradeWizard</h1>
   <div id="text" class="ui form">
-    <div id="score" class="ui big text">{{ total_score }}</div>
+    <div id="display" class="ui big text">
+      Note: Essays with a character count lesser than 1000 will be graded
+      zero.
+    </div>
+    <div id="display" class="ui big text">{{ total_score }}</div>
     <div id="text" class="field">
       <form action="/" name="essayform" method="POST">
         <p id="text" class="ui big text">
@@ -29,7 +34,9 @@
           you state your opinion on the effects computers have on people.
           Persuade the readers to agree with you.
         </p>
-        <textarea name="essay1" rows="20" placeholder="Enter your essay here"></textarea>
+        <textarea id="essay1" name="essay1" rows="20" oninput="countChar('1')"
+          placeholder=" Enter your essay here"></textarea>
+        <div id="count1" class="count" data-count="0"></div>
         <br />
         <br />
         <p id="text" class="ui big text">
@@ -45,7 +52,9 @@
           if they are found offensive? Support your position with convincing
           arguments from your own experience, observations, and/or reading.
         </p>
-        <textarea name="essay2" rows="20" placeholder="Enter your essay here"></textarea>
+        <textarea id="essay2" name="essay2" rows="20" oninput="countChar('2')"
+          placeholder=" Enter your essay here"></textarea>
+        <div id="count2" class="count" data-count="0"></div>
         <br />
         <br />
         <p id="text" class="ui big text">
@@ -65,7 +74,9 @@
           Describe the mood in the paragraph. Support your answer with
           relevant information from the paragraph.
         </p>
-        <textarea name="essay3" rows="20" placeholder="Enter your essay here"></textarea>
+        <textarea id="essay3" name="essay3" rows="20" oninput="countChar('3')"
+          placeholder=" Enter your essay here"></textarea>
+        <div id="count3" class="count" data-count="0"></div>
         <br />
         <br />
         <p id="text" class="ui big text">
@@ -76,7 +87,9 @@
           someone you know was patient OR write a story in your own way about
           patience.
         </p>
-        <textarea name="essay4" rows="20" placeholder="Enter your essay here"></textarea>
+        <textarea id="essay4" name="essay4" rows="20" oninput="countChar('4')"
+          placeholder=" Enter your essay here"></textarea>
+        <div id="count4" class="count" data-count="0"></div>
         <br />
         <br />
         <p id="text" class="ui big text">
@@ -86,8 +99,10 @@
           relationship. Tell a true story in which laughter was one element or
           part.
         </p>
-        <textarea name="essay5" rows="20" placeholder="Enter your essay here"></textarea>
-        <input id="submit" class="ui button" type="submit" value="Submit" />
+        <textarea id="essay5" name="essay5" rows="20" oninput="countChar('5')"
+          placeholder=" Enter your essay here"></textarea>
+        <div id="count5" class="count" data-count="0"></div>
+        <input id="submit" class="ui button" type="submit" value="Submit" onclick="return confirmSubmission()" />
       </form>
     </div>
   </div>
